@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SummarizeService {
 
+    private final CrawlingService crawlingService;
     private final ApiConfig apiConfig;
     private final OkHttpClient client = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -33,8 +34,7 @@ public class SummarizeService {
         log.info("📌 크롤링 요청 URL: {}, 플랫폼: {}",request.getUrl(),request.getPlatform());
 
         // python 크롤링 요청
-        // 현재 임의로 지정
-        String crawledContent = "클라이언트와 서버 간의 요청과 응답 상태를 나타낸다. 크게 100번대에서 500번대의 상태 코드가 있다.";
+        String crawledContent = crawlingService.fetchCrawledContent(request.getUrl());
 
         String summaryText = fetchSummary(crawledContent);
 
