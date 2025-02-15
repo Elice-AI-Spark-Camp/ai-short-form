@@ -7,8 +7,6 @@ import elice.aishortform.dto.SummarizeRequest;
 import elice.aishortform.dto.SummarizeResponse;
 import elice.aishortform.global.config.ApiConfig;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -25,11 +23,11 @@ import org.springframework.stereotype.Service;
 public class SummarizeService {
 
     private final ApiConfig apiConfig;
-
-    private static final String API_URL = "https://api-cloud-function.elice.io/9f071d94-a459-429d-a375-9601e521b079/v1/chat/completions";
-
     private final OkHttpClient client = new OkHttpClient();
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private static final String API_URL = "https://api-cloud-function.elice.io/9f071d94-a459-429d-a375-9601e521b079/v1/chat/completions";
+    private static final String SYSTEM_MESSAGE = "이 내용을 정리해줘. 한 문장 한 문장 사람한테 설명해주듯이 얘기해줘.";
 
     public SummarizeResponse summarize(SummarizeRequest request){
         log.info("📌 크롤링 요청 URL: {}, 플랫폼: {}",request.getUrl(),request.getPlatform());
@@ -54,52 +52,55 @@ public class SummarizeService {
         log.info("📌 요약 요청 시작");
 
         try {
-            Map<String, Object> requestData = new HashMap<>();
-            requestData.put("model","helpy-pro");
-            requestData.put("sess_id", UUID.randomUUID().toString());
+            Map<String, Object> requestData = createSummaryRequestData(userContent);
 
-            List<Map<String, String>> messages = new ArrayList<>();
+            String responseBody = sendRequest(requestData);
 
-            Map<String, String> systemMessage = new HashMap<>();
-            systemMessage.put("role","system");
-            systemMessage.put("content","이 내용을 정리해줘. 한 문장 한 문장 사람한테 설명해주듯이 얘기해줘.");
-            messages.add(systemMessage);
-
-            Map<String, String> userMessage = new HashMap<>();
-            userMessage.put("role","user");
-            userMessage.put("content",userContent);
-            messages.add(userMessage);
-
-            requestData.put("messages",messages);
-
-            String jsonRequestBody = objectMapper.writeValueAsString(requestData);
-            okhttp3.RequestBody body = okhttp3.RequestBody.create(jsonRequestBody, okhttp3.MediaType.parse("application/json"));
-
-            Request request = new Request.Builder()
-                    .url(API_URL)
-                    .post(body)
-                    .addHeader("Accept","application/json")
-                    .addHeader("Content-Type","application/json")
-                    .addHeader("Authorization", apiConfig.getKey())
-                    .build();
-
-            try (Response response = client.newCall(request).execute()) {
-                if (!response.isSuccessful()) {
-                    log.error("❌ API call failed with status: {} - {}",response.code(),response.message());
-                    return "Error: " + response.code() + " " + response.message();
-                }
-                assert response.body() != null;
-                String responseBody = response.body().string();
-                log.info("✅ API response received successfully");
-
-                JsonNode jsonNode = objectMapper.readTree(responseBody);
-                return jsonNode.path("choices").get(0).path("message").path("content").asText();
-            } catch (IOException e) {
-                log.error("❌ API request failed",e);
-                return "Error: " + e.getMessage();
-            }
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            return extractSummaryContent(responseBody);
+        } catch (Exception e) {
+            log.error("❌ 요약 API 요청 실패", e);
+            return "요약 API 오류 발생";
         }
+    }
+
+    // 요약 API 요청 데이터 생성
+    private Map<String, Object> createSummaryRequestData(String userContent) {
+        return Map.of(
+                "model", "helpy-pro",
+                "sess_id", UUID.randomUUID().toString(),
+                "messages", List.of(
+                        Map.of("role", "system", "content", SYSTEM_MESSAGE),
+                        Map.of("role", "user", "content", userContent)
+                )
+        );
+    }
+
+    // OkHttp를 사용하여 API 요청 전송
+    private String sendRequest(Map<String, Object> requestData) throws IOException {
+        String jsonRequestBody = objectMapper.writeValueAsString(requestData);
+        okhttp3.RequestBody body = okhttp3.RequestBody.create(jsonRequestBody, okhttp3.MediaType.parse("application/json"));
+
+        Request request = new Request.Builder()
+                .url(API_URL)
+                .post(body)
+                .addHeader("Accept","application/json")
+                .addHeader("Content-Type","application/json")
+                .addHeader("Authorization", apiConfig.getKey())
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                log.error("❌ API call failed with status: {} - {}",response.code(),response.message());
+                throw new IOException("API 요청 실패: " + response.code());
+            }
+            assert response.body() != null;
+            return response.body().string();
+        }
+    }
+
+    // JSON 응답에서 content 값 추출
+    private String extractSummaryContent(String responseBody) throws JsonProcessingException {
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        return jsonNode.path("choices").get(0).path("message").path("content").asText();
     }
 }
