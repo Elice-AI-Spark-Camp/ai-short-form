@@ -37,10 +37,10 @@ public class SummarizeService {
     private static final String SYSTEM_MESSAGE = "이 내용을 정리해줘. 한 문장 한 문장 사람한테 설명해주듯이 얘기해줘. 개행이나 특수 부호 없이 글자만 있게해줘.";
 
     public SummarizeResponse summarize(SummarizeRequest request){
-        log.info("📌 크롤링 요청 URL: {}, 플랫폼: {}",request.getUrl(),request.getPlatform());
+        log.info("📌 크롤링 요청 URL: {}, 플랫폼: {}",request.url(),request.platform());
 
         // python 크롤링 요청
-        String crawledContent = crawlingService.fetchCrawledContent(request.getUrl());
+        String crawledContent = crawlingService.fetchCrawledContent(request.url());
 
         String summaryText = fetchSummary(crawledContent);
 
@@ -49,7 +49,7 @@ public class SummarizeService {
                 .summaryId(summaryId)
                 .summaryText(summaryText)
                 .paragraphs(List.of(summaryText)) // 문단별 분리 구현해야함
-                .platform(request.getPlatform())
+                .platform(request.platform())
                 .build();
     }
 
