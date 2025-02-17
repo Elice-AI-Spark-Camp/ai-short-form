@@ -9,6 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Getter;
 
@@ -28,14 +29,16 @@ public class VideoJpaEntity {
 
 	protected VideoJpaEntity() {}
 
-	public VideoJpaEntity(Long summaryId) {
+	public VideoJpaEntity(Long summaryId, VideoStatus status, String videoUrl) {
 		this.summaryId = summaryId;
-		this.status = VideoStatus.PENDING;
-		this.createdAt = LocalDateTime.now();
-	}
-
-	public void updateStatus(VideoStatus status, String videoUrl) {
 		this.status = status;
 		this.videoUrl = videoUrl;
 	}
+
+	@PrePersist
+	protected void onCreate() {
+		this.createdAt = LocalDateTime.now();
+	}
+
+
 }

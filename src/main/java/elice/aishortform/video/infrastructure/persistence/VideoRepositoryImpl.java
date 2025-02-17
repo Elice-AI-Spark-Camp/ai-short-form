@@ -18,10 +18,9 @@ public class VideoRepositoryImpl implements VideoRepository {
 
 	@Override
 	public Video save(Video video) {
-		VideoJpaEntity entity = new VideoJpaEntity(video.getSummaryId());
-		entity.updateStatus(video.getStatus(), video.getVideoUrl());
+		VideoJpaEntity entity = new VideoJpaEntity(video.getSummaryId(), video.getStatus(), video.getVideoUrl());
 		videoJpaRepository.save(entity);
-		return video;
+		return new Video(entity.getSummaryId());
 	}
 
 	@Override
