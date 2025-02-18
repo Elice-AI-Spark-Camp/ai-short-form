@@ -12,11 +12,7 @@ import elice.aishortform.repository.SummaryRepository;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
@@ -48,26 +44,32 @@ public class ImageGenerationService {
         Summary summary = summaryRepository.findBySummaryId(summaryId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 summary_id가 존재하지 않습니다: " + summaryId));
         List<String> paragraphs = summary.getParagraphs();
+        Map<Integer, String> paragraphImageMap = summary.getParagraphImageMap(); // 기존 맵 가져오기
+
+        if (paragraphImageMap == null) {
+            paragraphImageMap = new HashMap<>();
+        }
 
         // 각 문단에 대해 이미지 생성 API 호출
         List<ImageDto> images = new ArrayList<>();
-        for (String paragraph : paragraphs) {
+        for (int i = 0; i < paragraphs.size(); i++) {
+            String paragraph = paragraphs.get(i);
             String imageId = generateUniqueImageId();
             String base64Image = fetchImages(paragraph);
 
             // base64 디코딩 -> 파일 저장
             if (base64Image != null) {
                 String imageUrl = saveImage(base64Image, imageId);
-
                 imageRepository.save(new ImageEntity(imageId, imageUrl));
-
                 images.add(new ImageDto(imageId, imageUrl));
+                paragraphImageMap.put(i, imageId);
             }
         }
 
+        summary = new Summary(summary.getSummaryId(), summary.getSummaryText(), summary.getParagraphs(), paragraphImageMap, summary.getPlatform());
+        summaryRepository.save(summary);
+
         log.info("✅ 이미지 생성 완료 (총 {}개)",images.size());
-
-
         return images;
     }
 
