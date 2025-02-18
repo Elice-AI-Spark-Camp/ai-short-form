@@ -1,4 +1,4 @@
-package elice.aishortform.video.application;
+package elice.aishortform.video.exception;
 
 public class VideoNotFoundException extends RuntimeException {
 	public VideoNotFoundException(Long videoId) {

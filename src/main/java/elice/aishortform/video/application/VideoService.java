@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import elice.aishortform.video.domain.model.Video;
 import elice.aishortform.video.domain.repository.VideoRepository;
+import elice.aishortform.video.exception.VideoNotFoundException;
+import elice.aishortform.video.exception.VideoProcessingException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
