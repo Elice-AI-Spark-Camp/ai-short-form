@@ -12,16 +12,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import elice.aishortform.video.application.VideoService;
 import elice.aishortform.video.domain.model.Video;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 
+@Tag(name = "Video API", description = "비디오 생성 및 조회 API")
 @RestController
 @RequestMapping("/videos")
-public class VideoController {
+@RequiredArgsConstructor
+public class VideoController implements VideoApiDocs {
 
 	private final VideoService videoService;
-
-	public VideoController(VideoService videoService) {
-		this.videoService = videoService;
-	}
 
 	@PostMapping("/generate")
 	public CompletableFuture<ResponseEntity<Video>> generateVideo(@RequestParam Long summaryId) {

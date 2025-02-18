@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 
 import elice.aishortform.video.domain.model.Video;
 import elice.aishortform.video.domain.repository.VideoRepository;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class VideoService {
 
@@ -25,10 +27,10 @@ public class VideoService {
 				videoRepository.save(video);
 				return video;
 			} catch (Exception e) {
-				throw new RuntimeException("비디오 생성에 실패했습니다.", e);
+				throw new VideoProcessingException("비디오 생성에 실패했습니다.", e);
 			}
 		}).exceptionally(ex -> {
-			System.err.println("예외 발생: " + ex.getMessage());
+			log.error("예외 발생: {}", ex.getMessage(), ex);
 			return null;
 		});
 	}
