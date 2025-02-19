@@ -19,7 +19,8 @@ public class WebConfig implements WebMvcConfigurer {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                    .allowedOriginPatterns("*")  // 모든 도메인 허용
+                    .allowedOrigins("https://ccqapyxttsnqmhxx.tunnel-pt.elice.io",
+                        "https://snapsum.vercel.app")
                     .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                     .allowedHeaders("*")
                     .allowCredentials(true);
