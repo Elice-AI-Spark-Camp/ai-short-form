@@ -52,17 +52,53 @@ public class ImageGenerationService {
 
         // 각 문단에 대해 이미지 생성 API 호출
         List<ImageDto> images = new ArrayList<>();
+        int batchSize = 5; // 한 번에 요청할 최대 개수
+        int waitTime = 2000; // 초기 대기 시간 (2초)
+
         for (int i = 0; i < paragraphs.size(); i++) {
             String paragraph = paragraphs.get(i);
             String imageId = generateUniqueImageId();
-            String base64Image = fetchImages(paragraph);
+            String base64Image = null;
 
-            // base64 디코딩 -> 파일 저장
-            if (base64Image != null) {
-                String imageUrl = saveImage(base64Image, imageId);
+            int retryCount = 0;
+            int maxRetries = 5;
+
+            while (retryCount < maxRetries) {
+                base64Image = fetchImages(paragraph);
+                if (base64Image != null) {
+                    break; // 성공하면 루프 탈출
+                }
+                log.warn("🚨 이미지 생성 실패 - {}ms 후 재시도", waitTime);
+                try {
+                    Thread.sleep(waitTime);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    log.error("❌ 재시도 중 인터럽트 발생");
+                    return images;
+                }
+                waitTime *= 2; // 대기 시간 2배 증가
+                retryCount++;
+            }
+
+            if (base64Image == null) {
+                log.error("❌ 이미지 생성 실패: 문단 {}", paragraph);
+                continue;
+            }
+
+            String imageUrl = saveImage(base64Image, imageId);
+            if (imageUrl != null) {
                 imageRepository.save(new ImageEntity(imageId, imageUrl));
                 images.add(new ImageDto(imageId, imageUrl));
                 paragraphImageMap.put(i, imageId);
+            }
+
+            if ((i + 1) % batchSize == 0) {
+                log.info("🕒 배치 요청 후 3초 대기...");
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
         }
 
@@ -107,14 +143,31 @@ public class ImageGenerationService {
                 .addHeader("Authorization",apiConfig.getKey())
                 .build();
 
-        try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                log.error("❌ API 요청 실패");
-                throw new IOException("API 요청 실패: " + response.code());
+        int retryCount = 0;
+        int maxRetries = 5; // 최대 5번 재시도
+        int waitTime = 2000; // 초기 대기 시간 2초
+
+        while (retryCount < maxRetries) {
+            try (Response response = client.newCall(request).execute()) {
+                if (response.isSuccessful()) {
+                    assert response.body() != null;
+                    return response.body().string();
+                } else if (response.code() == 429) { // 429 Too Many Requests 처리
+                    log.warn("🚨 429 Too Many Requests - {}ms 후 재시도", waitTime);
+                    Thread.sleep(waitTime);
+                    waitTime *= 2; // 지수적 증가 (2초 → 4초 → 8초 → 16초 → 32초)
+                    retryCount++;
+                } else {
+                    log.error("❌ API 요청 실패: {} - {}", response.code(), response.message());
+                    throw new IOException("API 요청 실패: " + response.code());
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new IOException("재시도 중 인터럽트 발생", e);
             }
-            assert response.body() != null;
-            return response.body().string();
         }
+
+        throw new IOException("API 요청 실패 (최대 재시도 횟수 초과)");
     }
 
     private String extractImage(String responseBody) throws JsonProcessingException {
