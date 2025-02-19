@@ -37,4 +37,8 @@ public class Summary {
     @Column(name = "platform", nullable = false, length = 50)
     private String platform;
 
+    public void updateText(String summaryText, List<String> paragraphs) {
+        this.summaryText = summaryText;
+        this.paragraphs = paragraphs;
+    }
 }

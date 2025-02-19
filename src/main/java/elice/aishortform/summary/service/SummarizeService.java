@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import elice.aishortform.summary.dto.SummarizeRequest;
 import elice.aishortform.summary.dto.SummarizeResponse;
+import elice.aishortform.summary.dto.SummarizeUpdateRequest;
 import elice.aishortform.summary.entity.Summary;
 import elice.aishortform.global.config.ApiConfig;
 import elice.aishortform.summary.repository.SummaryRepository;
@@ -20,6 +21,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -120,5 +122,15 @@ public class SummarizeService {
     private String extractSummaryContent(String responseBody) throws JsonProcessingException {
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         return jsonNode.path("choices").get(0).path("message").path("content").asText();
+    }
+
+    @Transactional
+    public Summary updateSummary(SummarizeUpdateRequest request) {
+        Summary summary = summaryRepository.findById(request.summaryId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 summary_id가 존재하지 않습니다: " + request.summaryId()));
+        List<String> paragraphs = Arrays.asList(request.summaryText().split("<br>"));
+        summary.updateText(request.summaryText(),paragraphs);
+
+        return summaryRepository.save(summary);
     }
 }
