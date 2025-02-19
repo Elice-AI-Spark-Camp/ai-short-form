@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class Summary {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "summary_id", nullable = false)
     private Long summaryId;
 
@@ -23,7 +24,7 @@ public class Summary {
 
     @ElementCollection
     @CollectionTable(name = "summary_paragraphs", joinColumns = @JoinColumn(name = "summary_id"))
-    @Column(name = "paragraph")
+    @Column(name = "paragraph", columnDefinition = "TEXT")
     @OrderColumn(name = "paragraph_index")
     private List<String> paragraphs;
 
