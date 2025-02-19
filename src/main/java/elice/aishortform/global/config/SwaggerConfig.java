@@ -1,13 +1,14 @@
 package elice.aishortform.global.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
 public class SwaggerConfig {
@@ -19,21 +20,11 @@ public class SwaggerConfig {
 		* 2. OpenAPI 정보 설정
 		 */
 
-		// SecurityScheme apiKey = new SecurityScheme()
-		// 	.type(SecurityScheme.Type.HTTP)  // HTTP 기반 인증 사용
-		// 	.in(SecurityScheme.In.HEADER)    // 인증 정보를 HTTP 헤더에서 받음
-		// 	.name("Authorization")           // 헤더 이름: "Authorization"
-		// 	.scheme("bearer")                // 인증 방식: Bearer (JWT 방식)
-		// 	.bearerFormat("JWT");            // 토큰 형식: JWT
-		//
-		// SecurityRequirement securityRequirement = new SecurityRequirement()
-		// 	.addList("Bearer Token");
-
 
 		return new OpenAPI()
-			.components(new Components()/*.addSecuritySchemes("Bearer Token", apiKey)*/)
-			// .addSecurityItem(securityRequirement)
-			.info(apiInfo());
+			.components(new Components())
+			.info(apiInfo())
+			.servers(serverList());
 	}
 
 	private Info apiInfo() {
@@ -41,5 +32,12 @@ public class SwaggerConfig {
 			.title("Ai Short Form API")
 			.description("AI 숏폼 제작 API")
 			.version("1.0");
+	}
+
+	private List<Server> serverList() {
+		return List.of(
+			new Server().url("https://ccqapyxttsnqmhxx.tunnel-pt.elice.io")  // ✅ 배포된 서버 URL
+				.description("Elice Cloud 서버")
+		);
 	}
 }
