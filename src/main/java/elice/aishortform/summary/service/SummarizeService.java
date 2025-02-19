@@ -10,6 +10,7 @@ import elice.aishortform.summary.entity.Summary;
 import elice.aishortform.global.config.ApiConfig;
 import elice.aishortform.summary.repository.SummaryRepository;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class SummarizeService {
                 Map.of(),
                 request.platform()
         );
-        summaryRepository.save(summary);
+        summary = summaryRepository.save(summary);
 
         return SummarizeResponse.builder()
                 .summaryId(summary.getSummaryId())
@@ -128,7 +129,8 @@ public class SummarizeService {
     public Summary updateSummary(SummarizeUpdateRequest request) {
         Summary summary = summaryRepository.findById(request.summaryId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 summary_id가 존재하지 않습니다: " + request.summaryId()));
-        List<String> paragraphs = Arrays.asList(request.summaryText().split("<br>"));
+        List<String> paragraphs = new ArrayList<>(Arrays.asList(request.summaryText().split("<br>")));
+
         summary.updateText(request.summaryText(),paragraphs);
 
         return summaryRepository.save(summary);
