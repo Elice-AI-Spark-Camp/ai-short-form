@@ -1,6 +1,6 @@
-package elice.aishortform.repository;
+package elice.aishortform.image.repository;
 
-import elice.aishortform.entity.ImageEntity;
+import elice.aishortform.image.entity.ImageEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

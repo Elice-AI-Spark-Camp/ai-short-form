@@ -1,4 +1,4 @@
-package elice.aishortform.service;
+package elice.aishortform.summary.service;
 
 import java.util.Objects;
 import org.springframework.http.*;

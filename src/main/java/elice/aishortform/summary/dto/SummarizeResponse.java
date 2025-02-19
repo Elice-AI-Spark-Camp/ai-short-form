@@ -1,4 +1,4 @@
-package elice.aishortform.dto;
+package elice.aishortform.summary.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;

@@ -1,7 +1,7 @@
-package elice.aishortform.controller;
+package elice.aishortform.image.controller;
 
-import elice.aishortform.dto.ImageGenerationRequestDto;
-import elice.aishortform.dto.ImageGenerationResponseDto;
+import elice.aishortform.image.dto.ImageGenerationRequestDto;
+import elice.aishortform.image.dto.ImageGenerationResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

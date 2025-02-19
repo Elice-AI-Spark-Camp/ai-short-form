@@ -1,8 +1,8 @@
-package elice.aishortform.controller;
+package elice.aishortform.summary.controller;
 
-import elice.aishortform.dto.SummarizeRequest;
-import elice.aishortform.dto.SummarizeResponse;
-import elice.aishortform.service.SummarizeService;
+import elice.aishortform.summary.dto.SummarizeRequest;
+import elice.aishortform.summary.dto.SummarizeResponse;
+import elice.aishortform.summary.service.SummarizeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestBody;

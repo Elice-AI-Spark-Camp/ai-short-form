@@ -1,14 +1,14 @@
-package elice.aishortform.service;
+package elice.aishortform.image.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import elice.aishortform.dto.ImageGenerationResponseDto.ImageDto;
-import elice.aishortform.entity.ImageEntity;
-import elice.aishortform.entity.Summary;
+import elice.aishortform.image.dto.ImageGenerationResponseDto.ImageDto;
+import elice.aishortform.image.entity.ImageEntity;
+import elice.aishortform.summary.entity.Summary;
 import elice.aishortform.global.config.ApiConfig;
-import elice.aishortform.repository.ImageRepository;
-import elice.aishortform.repository.SummaryRepository;
+import elice.aishortform.image.repository.ImageRepository;
+import elice.aishortform.summary.repository.SummaryRepository;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

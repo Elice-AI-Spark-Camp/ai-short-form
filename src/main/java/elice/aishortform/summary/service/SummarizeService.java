@@ -1,13 +1,13 @@
-package elice.aishortform.service;
+package elice.aishortform.summary.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import elice.aishortform.dto.SummarizeRequest;
-import elice.aishortform.dto.SummarizeResponse;
-import elice.aishortform.entity.Summary;
+import elice.aishortform.summary.dto.SummarizeRequest;
+import elice.aishortform.summary.dto.SummarizeResponse;
+import elice.aishortform.summary.entity.Summary;
 import elice.aishortform.global.config.ApiConfig;
-import elice.aishortform.repository.SummaryRepository;
+import elice.aishortform.summary.repository.SummaryRepository;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;

@@ -1,4 +1,4 @@
-package elice.aishortform.entity;
+package elice.aishortform.summary.entity;
 
 import jakarta.persistence.*;
 import java.util.List;

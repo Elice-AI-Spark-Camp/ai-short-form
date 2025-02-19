@@ -1,9 +1,9 @@
-package elice.aishortform.controller;
+package elice.aishortform.image.controller;
 
-import elice.aishortform.dto.ImageGenerationRequestDto;
-import elice.aishortform.dto.ImageGenerationResponseDto;
-import elice.aishortform.dto.ImageGenerationResponseDto.ImageDto;
-import elice.aishortform.service.ImageGenerationService;
+import elice.aishortform.image.dto.ImageGenerationRequestDto;
+import elice.aishortform.image.dto.ImageGenerationResponseDto;
+import elice.aishortform.image.dto.ImageGenerationResponseDto.ImageDto;
+import elice.aishortform.image.service.ImageGenerationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

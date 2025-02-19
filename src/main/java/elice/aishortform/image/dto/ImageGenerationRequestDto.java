@@ -1,4 +1,4 @@
-package elice.aishortform.dto;
+package elice.aishortform.image.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
