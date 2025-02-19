@@ -2,12 +2,16 @@ package elice.aishortform.video.domain.model;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Video {
+	private Long id;
 	private Long summaryId;
 	private String videoUrl;
 	private VideoStatus status;
