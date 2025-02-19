@@ -11,11 +11,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @Table(name = "videos")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class VideoJpaEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,8 +29,6 @@ public class VideoJpaEntity {
 	@Enumerated(EnumType.STRING)
 	private VideoStatus status;
 	private LocalDateTime createdAt;
-
-	protected VideoJpaEntity() {}
 
 	public VideoJpaEntity(Long summaryId, VideoStatus status, String videoUrl) {
 		this.summaryId = summaryId;
