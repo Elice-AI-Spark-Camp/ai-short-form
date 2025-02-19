@@ -1,12 +1,17 @@
-package elice.aishortform.service;
+package elice.aishortform.summary.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import elice.aishortform.dto.SummarizeRequest;
-import elice.aishortform.dto.SummarizeResponse;
+import elice.aishortform.summary.dto.SummarizeRequest;
+import elice.aishortform.summary.dto.SummarizeResponse;
+import elice.aishortform.summary.dto.SummarizeUpdateRequest;
+import elice.aishortform.summary.entity.Summary;
 import elice.aishortform.global.config.ApiConfig;
+import elice.aishortform.summary.repository.SummaryRepository;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -17,6 +22,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -25,6 +31,7 @@ public class SummarizeService {
 
     private final CrawlingService crawlingService;
     private final ApiConfig apiConfig;
+    private final SummaryRepository summaryRepository;
     private final OkHttpClient client = new OkHttpClient().newBuilder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
@@ -34,7 +41,7 @@ public class SummarizeService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String API_URL = "https://api-cloud-function.elice.io/9f071d94-a459-429d-a375-9601e521b079/v1/chat/completions";
-    private static final String SYSTEM_MESSAGE = "이 내용을 정리해줘. 한 문장 한 문장 사람한테 설명해주듯이 얘기해줘. 개행이나 특수 부호 없이 글자만 있게해줘.";
+    private static final String SYSTEM_MESSAGE = "이 내용을 정리해줘. 한 문장 한 문장 사람한테 설명해주듯이 얘기해줘. 개행이나 특수 부호 없이 글자만 있게해줘. 장면을 나눠서 <br>태그로 나눠줘.";
 
     public SummarizeResponse summarize(SummarizeRequest request){
         log.info("📌 크롤링 요청 URL: {}, 플랫폼: {}",request.url(),request.platform());
@@ -43,12 +50,21 @@ public class SummarizeService {
         String crawledContent = crawlingService.fetchCrawledContent(request.url());
 
         String summaryText = fetchSummary(crawledContent);
+        List<String> paragraphs = Arrays.asList(summaryText.split("<br>"));
 
-        Long summaryId = UUID.randomUUID().getMostSignificantBits() & Long.MAX_VALUE;
+        Summary summary = new Summary(
+                null,
+                summaryText,
+                paragraphs,
+                Map.of(),
+                request.platform()
+        );
+        summary = summaryRepository.save(summary);
+
         return SummarizeResponse.builder()
-                .summaryId(summaryId)
+                .summaryId(summary.getSummaryId())
                 .summaryText(summaryText)
-                .paragraphs(List.of(summaryText)) // 문단별 분리 구현해야함
+                .paragraphs(paragraphs)
                 .platform(request.platform())
                 .build();
     }
@@ -107,5 +123,16 @@ public class SummarizeService {
     private String extractSummaryContent(String responseBody) throws JsonProcessingException {
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         return jsonNode.path("choices").get(0).path("message").path("content").asText();
+    }
+
+    @Transactional
+    public Summary updateSummary(SummarizeUpdateRequest request) {
+        Summary summary = summaryRepository.findById(request.summaryId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 summary_id가 존재하지 않습니다: " + request.summaryId()));
+        List<String> paragraphs = new ArrayList<>(Arrays.asList(request.summaryText().split("<br>")));
+
+        summary.updateText(request.summaryText(),paragraphs);
+
+        return summaryRepository.save(summary);
     }
 }

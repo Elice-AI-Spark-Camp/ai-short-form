@@ -1,4 +1,4 @@
-package elice.aishortform.entity;
+package elice.aishortform.summary.entity;
 
 import jakarta.persistence.*;
 import java.util.List;
@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class Summary {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "summary_id", nullable = false)
     private Long summaryId;
 
@@ -23,7 +24,7 @@ public class Summary {
 
     @ElementCollection
     @CollectionTable(name = "summary_paragraphs", joinColumns = @JoinColumn(name = "summary_id"))
-    @Column(name = "paragraph")
+    @Column(name = "paragraph", columnDefinition = "TEXT")
     @OrderColumn(name = "paragraph_index")
     private List<String> paragraphs;
 
@@ -36,4 +37,8 @@ public class Summary {
     @Column(name = "platform", nullable = false, length = 50)
     private String platform;
 
+    public void updateText(String summaryText, List<String> paragraphs) {
+        this.summaryText = summaryText;
+        this.paragraphs = paragraphs;
+    }
 }
