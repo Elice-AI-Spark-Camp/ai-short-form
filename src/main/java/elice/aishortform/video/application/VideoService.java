@@ -1,6 +1,7 @@
 package elice.aishortform.video.application;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -29,8 +30,6 @@ public class VideoService {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				// 1. 새로운 비디오 객체 생성 후 저장
-				Video video = new Video(summaryId);
-				videoRepository.save(video);
 				log.info("🎬 비디오 생성 요청 시작 - Summary ID: {}", summaryId);
 
 				// 2. FastAPI 서버에 비디오 생성 요청
@@ -46,7 +45,8 @@ public class VideoService {
 					throw new VideoProcessingException("FastAPI 서버로부터 유효한 응답을 받지 못했습니다.");
 				}
 
-				// 4. 비디오 객체 업데이트 및 저장
+				// 4. 비디오 객체 생성 후 저장
+				Video video = new Video(summaryId);
 				video.markCompleted(response.videoUrl());
 				videoRepository.save(video);
 				log.info("✅ 비디오 생성 완료 - Video URL: {}", response.videoUrl());
@@ -58,7 +58,7 @@ public class VideoService {
 			}
 		}).exceptionally(ex -> {
 			log.error("❌ 예외 발생: {}", ex.getMessage(), ex);
-			return null;
+			throw new CompletionException(ex);
 		});
 	}
 
