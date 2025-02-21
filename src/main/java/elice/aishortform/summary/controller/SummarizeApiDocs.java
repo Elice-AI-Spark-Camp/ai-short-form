@@ -5,7 +5,10 @@ import elice.aishortform.summary.dto.SummarizeResponse;
 import elice.aishortform.summary.dto.SummarizeUpdateRequest;
 import elice.aishortform.summary.entity.Summary;
 import io.swagger.v3.oas.annotations.Operation;
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,4 +27,15 @@ public interface SummarizeApiDocs {
     )
     @PutMapping
     ResponseEntity<Summary> updateSummary(@RequestBody SummarizeUpdateRequest request);
+
+    @Operation(
+            summary = "TTS 음성 선택",
+            description = "사용자가 원하는 AI 음성을 선택합니다."
+    )
+    @PatchMapping("/{summary_id}/tts")
+    ResponseEntity<Map<String, String>> selectVoice(
+            @PathVariable("summary_id") Long summaryId,
+            @RequestBody Map<String, String> request
+    );
 }
+

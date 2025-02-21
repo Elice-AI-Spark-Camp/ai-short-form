@@ -6,8 +6,10 @@ import elice.aishortform.summary.dto.SummarizeUpdateRequest;
 import elice.aishortform.summary.entity.Summary;
 import elice.aishortform.summary.service.SummarizeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,5 +29,14 @@ public class SummarizeController implements SummarizeApiDocs{
     public ResponseEntity<Summary> updateSummary(@RequestBody SummarizeUpdateRequest request) {
         Summary updatedSummary = summarizeService.updateSummary(request);
         return ResponseEntity.ok(updatedSummary);
+    }
+
+    public ResponseEntity<Map<String, String>> selectVoice(
+            @PathVariable("summary_id") Long summaryId,
+            @RequestBody Map<String, String> request
+    ) {
+        String voice = request.get("voice");
+        summarizeService.updateTtsVoice(summaryId, voice);
+        return ResponseEntity.ok(Map.of("message","음성 선택 완료"));
     }
 }
