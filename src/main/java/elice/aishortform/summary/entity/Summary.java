@@ -6,6 +6,7 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -36,6 +37,10 @@ public class Summary {
 
     @Column(name = "platform", nullable = false, length = 50)
     private String platform;
+
+    @Setter
+    @Column(name = "voice", nullable = true, length = 20)
+    private String voice;
 
     public void updateText(String summaryText, List<String> paragraphs) {
         this.summaryText = summaryText;

@@ -57,7 +57,8 @@ public class SummarizeService {
                 summaryText,
                 paragraphs,
                 Map.of(),
-                request.platform()
+                request.platform(),
+                null
         );
         summary = summaryRepository.save(summary);
 
@@ -134,5 +135,16 @@ public class SummarizeService {
         summary.updateText(request.summaryText(),paragraphs);
 
         return summaryRepository.save(summary);
+    }
+
+    @Transactional
+    public void updateTtsVoice(Long summaryId, String voice) {
+        Summary summary = summaryRepository.findById(summaryId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 summary_id가 존재하지 않습니다."));
+
+        summary.setVoice(voice);
+        summaryRepository.save(summary);
+
+        log.info("✅ 음성 선택 완료 (summaryId={}, voice={})", summaryId, voice);
     }
 }

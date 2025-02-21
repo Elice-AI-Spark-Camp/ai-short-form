@@ -102,7 +102,8 @@ public class ImageGenerationService {
             }
         }
 
-        summary = new Summary(summary.getSummaryId(), summary.getSummaryText(), summary.getParagraphs(), paragraphImageMap, summary.getPlatform());
+        summary = new Summary(summary.getSummaryId(), summary.getSummaryText(), summary.getParagraphs(), paragraphImageMap, summary.getPlatform(),
+                summary.getVoice());
         summaryRepository.save(summary);
 
         log.info("✅ 이미지 생성 완료 (총 {}개)",images.size());
