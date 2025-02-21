@@ -39,10 +39,14 @@ public class ImageGenerationService {
 
     private static final String UPLOAD_DIR = "uploads/";
 
-    public List<ImageDto> generateImages(Long summaryId) {
+    public List<ImageDto> generateImages(Long summaryId, String style) {
         // summary_id에 해당하는 문단들 가져오기
         Summary summary = summaryRepository.findBySummaryId(summaryId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 summary_id가 존재하지 않습니다: " + summaryId));
+
+        summary.setStyle(style);
+        summaryRepository.save(summary);
+
         List<String> paragraphs = summary.getParagraphs();
         Map<Integer, String> paragraphImageMap = summary.getParagraphImageMap(); // 기존 맵 가져오기
 
@@ -64,7 +68,7 @@ public class ImageGenerationService {
             int maxRetries = 5;
 
             while (retryCount < maxRetries) {
-                base64Image = fetchImages(paragraph);
+                base64Image = fetchImages(paragraph, style);
                 if (base64Image != null) {
                     break; // 성공하면 루프 탈출
                 }
@@ -103,19 +107,18 @@ public class ImageGenerationService {
         }
 
         summary = new Summary(summary.getSummaryId(), summary.getSummaryText(), summary.getParagraphs(), paragraphImageMap, summary.getPlatform(),
-                summary.getVoice());
+                summary.getVoice(), summary.getStyle());
         summaryRepository.save(summary);
 
         log.info("✅ 이미지 생성 완료 (총 {}개)",images.size());
         return images;
     }
 
-    private String fetchImages(String prompt) {
-        log.info("📌 이미지 생성 요청 ({})",prompt);
+    private String fetchImages(String prompt, String style) {
+        log.info("📌 이미지 생성 요청 ({}-style={})",prompt,style);
 
         try {
-            Map<String, Object> requestData = createImageRequestData(prompt);
-
+            Map<String, Object> requestData = createImageRequestData(prompt, style);
             String responseBody = sendRequest(requestData);
 
             return extractImage(responseBody);
@@ -125,10 +128,10 @@ public class ImageGenerationService {
         }
     }
 
-    private Map<String, Object> createImageRequestData(String prompt) {
+    private Map<String, Object> createImageRequestData(String prompt, String style) {
         return Map.of(
                 "prompt", prompt,
-                "style", "polaroid"
+                "style", style
         );
     }
 

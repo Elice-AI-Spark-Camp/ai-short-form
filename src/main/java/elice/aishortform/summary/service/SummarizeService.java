@@ -59,6 +59,7 @@ public class SummarizeService {
                 paragraphs,
                 Map.of(),
                 request.platform(),
+                null,
                 null
         );
         summary = summaryRepository.save(summary);
