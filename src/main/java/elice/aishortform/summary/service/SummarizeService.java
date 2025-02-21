@@ -144,4 +144,21 @@ public class SummarizeService {
 
         log.info("✅ 음성 선택 완료 (summaryId={}, voice={})", summaryId, voice);
     }
+
+    public Summary getSummaryById(Long summaryId) {
+        return summaryRepository.findBySummaryId(summaryId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 summary_id가 존재하지 않습니다: " + summaryId));
+    }
+
+    @Transactional
+    public void updateSummaryStyle(Long summaryId, String style) {
+        Summary summary = getSummaryById(summaryId);
+        summary.setStyle(style);
+        summaryRepository.save(summary);
+    }
+
+    @Transactional
+    public void updateSummary(Summary summary) {
+        summaryRepository.save(summary);
+    }
 }

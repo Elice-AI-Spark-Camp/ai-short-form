@@ -8,7 +8,7 @@ import elice.aishortform.image.entity.ImageEntity;
 import elice.aishortform.summary.entity.Summary;
 import elice.aishortform.global.config.ApiConfig;
 import elice.aishortform.image.repository.ImageRepository;
-import elice.aishortform.summary.repository.SummaryRepository;
+import elice.aishortform.summary.service.SummarizeService;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,26 +26,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ImageGenerationService {
 
-    private final SummaryRepository summaryRepository;
+    private final SummarizeService summarizeService;
     private final ImageRepository imageRepository;
     private final ObjectMapper objectMapper;
-
-    private final OkHttpClient client = new OkHttpClient().newBuilder()
-            .retryOnConnectionFailure(true)
-            .build();
-
-    private static final String API_URL = "https://api-cloud-function.elice.io/0133c2f7-9f3f-44b6-a3d6-c24ba8ef4510/generate";
+    private final OkHttpClient client;
     private final ApiConfig apiConfig;
-
+    private static final String API_URL = "https://api-cloud-function.elice.io/0133c2f7-9f3f-44b6-a3d6-c24ba8ef4510/generate";
     private static final String UPLOAD_DIR = "uploads/";
 
     public List<ImageDto> generateImages(Long summaryId, String style) {
         // summary_id에 해당하는 문단들 가져오기
-        Summary summary = summaryRepository.findBySummaryId(summaryId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 summary_id가 존재하지 않습니다: " + summaryId));
-
-        summary.setStyle(style);
-        summaryRepository.save(summary);
+        Summary summary = summarizeService.getSummaryById(summaryId);
+        summarizeService.updateSummaryStyle(summaryId, style);
 
         List<String> paragraphs = summary.getParagraphs();
         Map<Integer, String> paragraphImageMap = summary.getParagraphImageMap(); // 기존 맵 가져오기
@@ -90,11 +82,10 @@ public class ImageGenerationService {
             }
 
             String imageUrl = saveImage(base64Image, imageId);
-            if (imageUrl != null) {
-                imageRepository.save(new ImageEntity(imageId, imageUrl));
-                images.add(new ImageDto(imageId, imageUrl));
-                paragraphImageMap.put(i, imageId);
-            }
+            imageRepository.save(new ImageEntity(imageId, imageUrl));
+            images.add(new ImageDto(imageId, imageUrl));
+            paragraphImageMap.put(i, imageId);
+
 
             if ((i + 1) % batchSize == 0) {
                 log.info("🕒 배치 요청 후 3초 대기...");
@@ -108,7 +99,7 @@ public class ImageGenerationService {
 
         summary = new Summary(summary.getSummaryId(), summary.getSummaryText(), summary.getParagraphs(), paragraphImageMap, summary.getPlatform(),
                 summary.getVoice(), summary.getStyle());
-        summaryRepository.save(summary);
+        summarizeService.updateSummary(summary);
 
         log.info("✅ 이미지 생성 완료 (총 {}개)",images.size());
         return images;
@@ -120,11 +111,10 @@ public class ImageGenerationService {
         try {
             Map<String, Object> requestData = createImageRequestData(prompt, style);
             String responseBody = sendRequest(requestData);
-
             return extractImage(responseBody);
         } catch (IOException e) {
             log.error("❌ 이미지 생성 API 요청 실패",e);
-            return null;
+            throw new RuntimeException("이미지 생성 API 요청 실패",e);
         }
     }
 
@@ -197,7 +187,7 @@ public class ImageGenerationService {
             return "http://localhost:8080/uploads/" + imageId + ".png";
         } catch (Exception e) {
             log.error("❌ 이미지 저장 실패");
-            return null;
+            throw new RuntimeException("이미지 저장 중 오류 발생",e);
         }
     }
 

@@ -29,6 +29,7 @@ public class Summary {
     @OrderColumn(name = "paragraph_index")
     private List<String> paragraphs;
 
+    @Setter
     @ElementCollection
     @CollectionTable(name = "summary_images", joinColumns = @JoinColumn(name = "summary_id"))
     @MapKeyColumn(name = "paragraph_index")
