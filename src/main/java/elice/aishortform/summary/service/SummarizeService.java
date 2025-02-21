@@ -3,6 +3,8 @@ package elice.aishortform.summary.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import elice.aishortform.global.config.SummaryConfig;
+import elice.aishortform.global.config.TtsVoiceConfig;
 import elice.aishortform.summary.dto.SummarizeRequest;
 import elice.aishortform.summary.dto.SummarizeResponse;
 import elice.aishortform.summary.dto.SummarizeUpdateRequest;
@@ -39,9 +41,8 @@ public class SummarizeService {
             .retryOnConnectionFailure(true)
             .build();
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private static final String API_URL = "https://api-cloud-function.elice.io/9f071d94-a459-429d-a375-9601e521b079/v1/chat/completions";
-    private static final String SYSTEM_MESSAGE = "이 내용을 정리해줘. 한 문장 한 문장 사람한테 설명해주듯이 얘기해줘. 개행이나 특수 부호 없이 글자만 있게해줘. 장면을 나눠서 <br>태그로 나눠줘.";
+    private final TtsVoiceConfig ttsVoiceConfig;
+    private final SummaryConfig summaryConfig;
 
     public SummarizeResponse summarize(SummarizeRequest request){
         log.info("📌 크롤링 요청 URL: {}, 플랫폼: {}",request.url(),request.platform());
@@ -91,7 +92,7 @@ public class SummarizeService {
                 "model", "helpy-pro",
                 "sess_id", UUID.randomUUID().toString(),
                 "messages", List.of(
-                        Map.of("role", "system", "content", SYSTEM_MESSAGE),
+                        Map.of("role", "system", "content", summaryConfig.getSystemMessage()),
                         Map.of("role", "user", "content", userContent)
                 )
         );
@@ -103,7 +104,7 @@ public class SummarizeService {
         okhttp3.RequestBody body = okhttp3.RequestBody.create(jsonRequestBody, okhttp3.MediaType.parse("application/json"));
 
         Request request = new Request.Builder()
-                .url(API_URL)
+                .url(summaryConfig.getUrl())
                 .post(body)
                 .addHeader("Accept","application/json")
                 .addHeader("Content-Type","application/json")
@@ -142,7 +143,8 @@ public class SummarizeService {
         Summary summary = summaryRepository.findById(summaryId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 summary_id가 존재하지 않습니다."));
 
-        summary.setVoice(voice);
+        String googleVoice = ttsVoiceConfig.getVoices().get(voice);
+        summary.setVoice(googleVoice);
         summaryRepository.save(summary);
 
         log.info("✅ 음성 선택 완료 (summaryId={}, voice={})", summaryId, voice);
