@@ -3,6 +3,8 @@ package elice.aishortform.summary.controller;
 import elice.aishortform.summary.dto.SummarizeRequest;
 import elice.aishortform.summary.dto.SummarizeResponse;
 import elice.aishortform.summary.dto.SummarizeUpdateRequest;
+import elice.aishortform.summary.dto.VoiceRequestDto;
+import elice.aishortform.summary.dto.VoiceResponseDto;
 import elice.aishortform.summary.entity.Summary;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.Map;
@@ -33,9 +35,9 @@ public interface SummarizeApiDocs {
             description = "사용자가 원하는 AI 음성을 선택합니다."
     )
     @PatchMapping("/{summary_id}/tts")
-    ResponseEntity<Map<String, String>> selectVoice(
+    public ResponseEntity<VoiceResponseDto> selectVoice(
             @PathVariable("summary_id") Long summaryId,
-            @RequestBody Map<String, String> request
+            @RequestBody VoiceRequestDto request
     );
 }
 
