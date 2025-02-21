@@ -7,7 +7,6 @@ import elice.aishortform.summary.dto.VoiceRequestDto;
 import elice.aishortform.summary.dto.VoiceResponseDto;
 import elice.aishortform.summary.entity.Summary;
 import io.swagger.v3.oas.annotations.Operation;
-import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,7 +34,7 @@ public interface SummarizeApiDocs {
             description = "사용자가 원하는 AI 음성을 선택합니다."
     )
     @PatchMapping("/{summary_id}/tts")
-    public ResponseEntity<VoiceResponseDto> selectVoice(
+    ResponseEntity<VoiceResponseDto> selectVoice(
             @PathVariable("summary_id") Long summaryId,
             @RequestBody VoiceRequestDto request
     );

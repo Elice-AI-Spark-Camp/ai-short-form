@@ -1,20 +1,23 @@
 package elice.aishortform.summary.service;
 
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+
 @Service
+@RequiredArgsConstructor
 public class CrawlingService {
 
     private static final String PYTHON_CRAWLER_URL = "http://127.0.0.1:5001/crawl/";
 
-    public String fetchCrawledContent(String blogUrl) {
-        RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
+    public String fetchCrawledContent(String blogUrl) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("url",blogUrl);
 

@@ -8,7 +8,6 @@ import elice.aishortform.summary.dto.VoiceResponseDto;
 import elice.aishortform.summary.entity.Summary;
 import elice.aishortform.summary.service.SummarizeService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;

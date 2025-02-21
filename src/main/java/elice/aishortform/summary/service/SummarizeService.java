@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
@@ -34,13 +33,8 @@ public class SummarizeService {
     private final CrawlingService crawlingService;
     private final ApiConfig apiConfig;
     private final SummaryRepository summaryRepository;
-    private final OkHttpClient client = new OkHttpClient().newBuilder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
-            .retryOnConnectionFailure(true)
-            .build();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final OkHttpClient client;
+    private final ObjectMapper objectMapper;
     private final TtsVoiceConfig ttsVoiceConfig;
     private final SummaryConfig summaryConfig;
 
