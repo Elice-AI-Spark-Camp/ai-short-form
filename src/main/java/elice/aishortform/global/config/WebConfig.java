@@ -17,14 +17,22 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("${fastapi.url}")
     private String fastApiUrl;
 
+    @Value("${springapi.url}")
+    private String springApiUrl;
+
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                    .allowedOrigins("https://ccqapyxttsnqmhxx.tunnel-pt.elice.io",
-                        "https://snapsum.vercel.app", "http://localhost:3000", fastApiUrl)
+                    .allowedOrigins(
+                        "http://localhost:8000",
+                        springApiUrl,
+                        "https://snapsum.vercel.app",
+                        "http://localhost:3000",
+                        fastApiUrl
+                    )
                     .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                     .allowedHeaders("*")
                     .allowCredentials(true);
