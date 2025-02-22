@@ -39,7 +39,7 @@ public class SwaggerConfig {
 			new Server().url("http://localhost:8000").description("로컬 개발 서버"),  // ✅ 로컬 서버 URL
 			new Server().url("https://ccqapyxttsnqmhxx.tunnel-pt.elice.io").description("Elice Cloud 서버"),  // ✅ 배포된 서버 URL
 			new Server().url("https://snapsum.vercel.app").description("Vercel 서버"),  // ✅ 배포된 서버 URL
-			new Server().url("localhost:3000").description("로컬 개발 서버")  // ✅ 배포된 서버 URL
+			new Server().url("http://localhost:3000").description("로컬 개발 서버")  // ✅ 배포된 서버 URL
 
 		);
 	}
