@@ -1,7 +1,8 @@
 package elice.aishortform.summary.service;
 
 import java.util.Objects;
-import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,9 +14,16 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class CrawlingService {
 
-    private static final String PYTHON_CRAWLER_URL = "http://127.0.0.1:5001/crawl/";
-
+    private final String fastApiUrl;
     private final RestTemplate restTemplate;
+
+    public CrawlingService(@Value("${fastapi.url}") String fastApiUrl) {
+        this.fastApiUrl = fastApiUrl;
+        this.restTemplate = new RestTemplate();
+    }
+
+    public String fetchCrawledContent(String blogUrl) {
+        String apiUrl = fastApiUrl + "/crawl";
 
     public String fetchCrawledContent(String blogUrl) {
         Map<String, String> requestBody = new HashMap<>();
@@ -26,7 +34,7 @@ public class CrawlingService {
 
         HttpEntity<Map<String, String>> request = new HttpEntity<>(requestBody, headers);
 
-        ResponseEntity<Map> response = restTemplate.postForEntity(PYTHON_CRAWLER_URL,request,Map.class);
+        ResponseEntity<Map> response = restTemplate.postForEntity(apiUrl,request,Map.class);
 
         if (response.getStatusCode() == HttpStatus.OK) {
             return (String) Objects.requireNonNull(response.getBody()).get("blog_content");
