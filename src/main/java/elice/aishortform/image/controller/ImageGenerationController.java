@@ -22,7 +22,7 @@ public class ImageGenerationController implements ImageApiDocs {
     private final ImageGenerationService imageGenerationService;
 
     public ResponseEntity<ImageGenerationResponseDto> generateImages(@RequestBody ImageGenerationRequestDto request) {
-        List<ImageDto> images = imageGenerationService.generateImages(request.summaryId());
+        List<ImageDto> images = imageGenerationService.generateImages(request.summaryId(), request.style());
         return ResponseEntity.ok(new ImageGenerationResponseDto(images, images.size()));
     }
 }

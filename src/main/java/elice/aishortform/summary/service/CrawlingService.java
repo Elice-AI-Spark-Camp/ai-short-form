@@ -9,7 +9,9 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+
 @Service
+@RequiredArgsConstructor
 public class CrawlingService {
 
     private final String fastApiUrl;
@@ -23,6 +25,7 @@ public class CrawlingService {
     public String fetchCrawledContent(String blogUrl) {
         String apiUrl = fastApiUrl + "/crawl";
 
+    public String fetchCrawledContent(String blogUrl) {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("url",blogUrl);
 

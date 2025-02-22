@@ -29,6 +29,7 @@ public class Summary {
     @OrderColumn(name = "paragraph_index")
     private List<String> paragraphs;
 
+    @Setter
     @ElementCollection
     @CollectionTable(name = "summary_images", joinColumns = @JoinColumn(name = "summary_id"))
     @MapKeyColumn(name = "paragraph_index")
@@ -41,6 +42,10 @@ public class Summary {
     @Setter
     @Column(name = "voice", nullable = true, length = 20)
     private String voice;
+
+    @Setter
+    @Column(name = "style", nullable = true, length = 20)
+    private String style;
 
     public void updateText(String summaryText, List<String> paragraphs) {
         this.summaryText = summaryText;

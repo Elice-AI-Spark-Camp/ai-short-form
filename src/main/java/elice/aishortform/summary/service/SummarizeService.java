@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
@@ -34,13 +33,8 @@ public class SummarizeService {
     private final CrawlingService crawlingService;
     private final ApiConfig apiConfig;
     private final SummaryRepository summaryRepository;
-    private final OkHttpClient client = new OkHttpClient().newBuilder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
-            .retryOnConnectionFailure(true)
-            .build();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final OkHttpClient client;
+    private final ObjectMapper objectMapper;
     private final TtsVoiceConfig ttsVoiceConfig;
     private final SummaryConfig summaryConfig;
 
@@ -59,6 +53,7 @@ public class SummarizeService {
                 paragraphs,
                 Map.of(),
                 request.platform(),
+                null,
                 null
         );
         summary = summaryRepository.save(summary);
@@ -148,5 +143,22 @@ public class SummarizeService {
         summaryRepository.save(summary);
 
         log.info("✅ 음성 선택 완료 (summaryId={}, voice={})", summaryId, voice);
+    }
+
+    public Summary getSummaryById(Long summaryId) {
+        return summaryRepository.findBySummaryId(summaryId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 summary_id가 존재하지 않습니다: " + summaryId));
+    }
+
+    @Transactional
+    public void updateSummaryStyle(Long summaryId, String style) {
+        Summary summary = getSummaryById(summaryId);
+        summary.setStyle(style);
+        summaryRepository.save(summary);
+    }
+
+    @Transactional
+    public void updateSummary(Summary summary) {
+        summaryRepository.save(summary);
     }
 }
