@@ -19,6 +19,7 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -33,6 +34,9 @@ public class ImageGenerationService {
     private final ApiConfig apiConfig;
     private static final String API_URL = "https://api-cloud-function.elice.io/0133c2f7-9f3f-44b6-a3d6-c24ba8ef4510/generate";
     private static final String UPLOAD_DIR = "uploads/";
+
+    @Value("${springapi.url}")
+    private String serverUrl;
 
     public List<ImageDto> generateImages(Long summaryId, String style) {
         // summary_id에 해당하는 문단들 가져오기
@@ -184,7 +188,7 @@ public class ImageGenerationService {
             }
 
             log.info("✅ 이미지 저장 완료 (filePath={})",filePath);
-            return "http://localhost:8080/uploads/" + imageId + ".png";
+            return serverUrl + "/uploads/" + imageId + ".png";
         } catch (Exception e) {
             log.error("❌ 이미지 저장 실패");
             throw new RuntimeException("이미지 저장 중 오류 발생",e);
