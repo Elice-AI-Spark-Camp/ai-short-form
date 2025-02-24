@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import elice.aishortform.image.dto.ImageGenerationResponseDto.ImageDto;
-import elice.aishortform.image.entity.ImageEntity;
+import elice.aishortform.image.entity.Image;
 import elice.aishortform.summary.entity.Summary;
 import elice.aishortform.global.config.ApiConfig;
 import elice.aishortform.image.repository.ImageRepository;
@@ -86,7 +86,7 @@ public class ImageGenerationService {
             }
 
             String imageUrl = saveImage(base64Image, imageId);
-            imageRepository.save(new ImageEntity(imageId, imageUrl));
+            imageRepository.save(new Image(imageId, imageUrl));
             images.add(new ImageDto(imageId, imageUrl));
             paragraphImageMap.put(i, imageId);
 
@@ -107,6 +107,30 @@ public class ImageGenerationService {
 
         log.info("✅ 이미지 생성 완료 (총 {}개)",images.size());
         return images;
+    }
+
+    public ImageDto regenerateImage(String imageId) {
+        Image existingImage = imageRepository.findById(imageId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이미지 ID입니다: " + imageId));
+
+        Summary summary = summarizeService.getSummaryByImageId(imageId);
+        Integer paragraphIndex = summary.getParagraphImageMap().entrySet().stream()
+                .filter(entry -> entry.getValue().equals(imageId))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("이미지와 연결된 문단을 찾을 수 없습니다."));
+
+        String paragraphText = summary.getParagraphs().get(paragraphIndex);
+
+        String base64Image = fetchImages(paragraphText, summary.getStyle());
+        String newImageUrl = saveImage(base64Image, imageId);
+
+        Image newImage = new Image(imageId, newImageUrl);
+        imageRepository.save(newImage);
+        summary.getParagraphImageMap().put(paragraphIndex, imageId);
+        summarizeService.updateSummary(summary);
+
+        return new ImageDto(imageId, newImageUrl);
     }
 
     private String fetchImages(String prompt, String style) {

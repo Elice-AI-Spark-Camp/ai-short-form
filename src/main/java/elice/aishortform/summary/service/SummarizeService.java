@@ -161,4 +161,11 @@ public class SummarizeService {
     public void updateSummary(Summary summary) {
         summaryRepository.save(summary);
     }
+
+    public Summary getSummaryByImageId(String imageId) {
+        return summaryRepository.findAll().stream()
+                .filter(summary -> summary.getParagraphImageMap().containsValue(imageId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("해당 image_id에 대한 Summary를 찾을 수 없습니다: " + imageId));
+    }
 }
