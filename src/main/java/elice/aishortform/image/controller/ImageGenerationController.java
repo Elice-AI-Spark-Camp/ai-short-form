@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,5 +25,10 @@ public class ImageGenerationController implements ImageApiDocs {
     public ResponseEntity<ImageGenerationResponseDto> generateImages(@RequestBody ImageGenerationRequestDto request) {
         List<ImageDto> images = imageGenerationService.generateImages(request.summaryId(), request.style());
         return ResponseEntity.ok(new ImageGenerationResponseDto(images, images.size()));
+    }
+
+    public ResponseEntity<ImageDto> regenerateImage(@PathVariable("image_id") String imageId) {
+        ImageDto newImage = imageGenerationService.regenerateImage(imageId);
+        return ResponseEntity.ok(newImage);
     }
 }

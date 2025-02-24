@@ -2,9 +2,12 @@ package elice.aishortform.image.controller;
 
 import elice.aishortform.image.dto.ImageGenerationRequestDto;
 import elice.aishortform.image.dto.ImageGenerationResponseDto;
+import elice.aishortform.image.dto.ImageGenerationResponseDto.ImageDto;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 public interface ImageApiDocs {
@@ -18,4 +21,13 @@ public interface ImageApiDocs {
     )
     @PostMapping("/generate-all")
     ResponseEntity<ImageGenerationResponseDto> generateImages(@RequestBody ImageGenerationRequestDto request);
+
+    @Operation(
+            summary = "기존 이미지 재생성",
+            description = "주어진 image_id에 대해 새로운 AI 이미지를 생성합니다. \n" +
+                    "- 요청: image_id \n" +
+                    "- 응답: image_id, image_url \n"
+    )
+    @PutMapping("/{image_id}/regenerate")
+    ResponseEntity<ImageDto> regenerateImage(@PathVariable("image_id") String imageId);
 }

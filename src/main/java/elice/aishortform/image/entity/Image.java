@@ -15,7 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "image")
-public class ImageEntity {
+public class Image {
 
     @Id
     @Column(name = "image_id", nullable = false, unique = true)
