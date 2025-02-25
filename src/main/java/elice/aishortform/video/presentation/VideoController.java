@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import elice.aishortform.video.application.VideoService;
 import elice.aishortform.video.domain.model.Video;
+import elice.aishortform.video.exception.VideoNotFoundException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
@@ -34,6 +35,14 @@ public class VideoController implements VideoApiDocs {
 	public ResponseEntity<List<Video>> getVideosBySummaryId(@PathVariable Long summaryId) {
 		List<Video> videos = videoService.getVideosBySummaryId(summaryId);
 		return ResponseEntity.ok(videos);
+	}
+	
+	@GetMapping("/{videoId}")
+	public ResponseEntity<Video> getVideo(@PathVariable("videoId") Long videoId) {
+		// VideoService에 getVideo 메서드 추가 필요
+		Video video = videoService.getVideo(videoId)
+			.orElseThrow(() -> new VideoNotFoundException(videoId));
+		return ResponseEntity.ok(video);
 	}
 }
 

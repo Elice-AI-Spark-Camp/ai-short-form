@@ -106,4 +106,8 @@ public class VideoService {
 	public List<Video> getVideosBySummaryId(Long summaryId) {
 		return videoRepository.findBySummaryId(summaryId);
 	}
+
+	public Optional<Video> getVideo(Long videoId) {
+		return videoRepository.findById(videoId);
+	}
 }
