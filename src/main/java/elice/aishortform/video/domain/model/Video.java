@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Getter
 public class Video {
@@ -11,7 +12,8 @@ public class Video {
 	private final Long summaryId;
 	private String videoUrl;
 	private VideoStatus status;
-	private final LocalDateTime createdAt;
+	@JsonIgnore
+	private LocalDateTime createdAt;
 	
 	public Video(Long id, Long summaryId, String videoUrl, VideoStatus status, LocalDateTime createdAt) {
 		this.id = id;

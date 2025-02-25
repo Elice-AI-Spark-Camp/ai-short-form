@@ -73,7 +73,7 @@ public class VideoService {
 
 				VideoRequest request = new VideoRequest(
 					summaryId,
-					paragraphsCopy,  // 복사본 사용
+					paragraphsCopy,	
 					summary.getVoice(),
 					imageUrls
 				);
