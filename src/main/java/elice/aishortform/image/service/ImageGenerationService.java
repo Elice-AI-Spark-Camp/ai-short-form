@@ -132,7 +132,9 @@ public class ImageGenerationService {
     private Map<String, Object> createImageRequestData(String prompt, String style) {
         return Map.of(
                 "prompt", prompt,
-                "style", style
+                "style", style,
+                "width", 576,
+                "height", 1024
         );
     }
 
