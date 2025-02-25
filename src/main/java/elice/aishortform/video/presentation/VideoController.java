@@ -1,6 +1,7 @@
 package elice.aishortform.video.presentation;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,10 +30,10 @@ public class VideoController implements VideoApiDocs {
 			.thenApply(ResponseEntity::ok);
 	}
 
-	@GetMapping("/{videoId}")
-	public ResponseEntity<Video> getVideo(@PathVariable("videoId") Long videoId) {
-		Video video = videoService.getVideo(videoId);
-		return ResponseEntity.ok(video);
+	@GetMapping("/summary/{summaryId}")
+	public ResponseEntity<List<Video>> getVideosBySummaryId(@PathVariable Long summaryId) {
+		List<Video> videos = videoService.getVideosBySummaryId(summaryId);
+		return ResponseEntity.ok(videos);
 	}
 }
 
