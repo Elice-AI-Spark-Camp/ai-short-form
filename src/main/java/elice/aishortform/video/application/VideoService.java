@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.HashMap;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,7 +19,6 @@ import elice.aishortform.video.domain.model.Video;
 import elice.aishortform.video.domain.repository.VideoRepository;
 import elice.aishortform.video.dto.VideoRequest;
 import elice.aishortform.video.dto.VideoResponse;
-import elice.aishortform.video.exception.VideoNotFoundException;
 import elice.aishortform.video.exception.VideoProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
