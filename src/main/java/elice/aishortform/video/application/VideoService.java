@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.HashMap;
+import java.util.ArrayList;
 
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -68,11 +69,13 @@ public class VideoService {
 					}
 				}
 
+				List<String> paragraphsCopy = new ArrayList<>(summary.getParagraphs());
+
 				VideoRequest request = new VideoRequest(
 					summaryId,
-					summary.getParagraphs(),
+					paragraphsCopy,  // 복사본 사용
 					summary.getVoice(),
-					imageUrls  // 변환된 이미지 URL 맵
+					imageUrls
 				);
 
 				VideoResponse response = webClient.post()
