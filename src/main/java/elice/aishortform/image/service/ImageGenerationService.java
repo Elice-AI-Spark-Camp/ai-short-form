@@ -9,10 +9,10 @@ import elice.aishortform.summary.entity.Summary;
 import elice.aishortform.global.config.ApiConfig;
 import elice.aishortform.image.repository.ImageRepository;
 import elice.aishortform.summary.service.SummarizeService;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
@@ -20,6 +20,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -38,79 +39,61 @@ public class ImageGenerationService {
     @Value("${springapi.url}")
     private String serverUrl;
 
+    @Async
+    public CompletableFuture<ImageDto> generateImageAsync(String paragraph, String style) {
+        return CompletableFuture.supplyAsync(() -> {
+            log.info("📌 비동기 이미지 생성 시작 (paragraph={}) - thread:{}", paragraph, Thread.currentThread().getName());
+
+            String imageId = generateUniqueImageId();
+            String base64Image = fetchImages(paragraph, style);
+
+            if (base64Image == null) {
+                log.error("❌ 이미지 생성 실패: 문단 {}",paragraph);
+                throw new RuntimeException("이미지 생성 실패");
+            }
+
+            String imageUrl = saveImage(base64Image, imageId);
+            imageRepository.save(new Image(imageId, imageUrl));
+
+            log.info("✅ 비동기 이미지 생성 완료 (imageId={}, url={})",imageId,imageUrl);
+            return new ImageDto(imageId, imageUrl);
+        });
+    }
+
     public List<ImageDto> generateImages(Long summaryId, String style) {
         // summary_id에 해당하는 문단들 가져오기
         Summary summary = summarizeService.getSummaryById(summaryId);
         summarizeService.updateSummaryStyle(summaryId, style);
 
         List<String> paragraphs = summary.getParagraphs();
-        Map<Integer, String> paragraphImageMap = summary.getParagraphImageMap(); // 기존 맵 가져오기
-
+        Map<Integer, String> paragraphImageMap = summary.getParagraphImageMap();
         if (paragraphImageMap == null) {
             paragraphImageMap = new HashMap<>();
         }
 
-        // 각 문단에 대해 이미지 생성 API 호출
-        List<ImageDto> images = new ArrayList<>();
-        int batchSize = 5; // 한 번에 요청할 최대 개수
-        int waitTime = 2000; // 초기 대기 시간 (2초)
-
-        for (int i = 0; i < paragraphs.size(); i++) {
-            String paragraph = paragraphs.get(i);
-            String imageId = generateUniqueImageId();
-            String base64Image = null;
-
-            int retryCount = 0;
-            int maxRetries = 5;
-
-            while (retryCount < maxRetries) {
-                base64Image = fetchImages(paragraph, style);
-                if (base64Image != null) {
-                    break; // 성공하면 루프 탈출
-                }
-                log.warn("🚨 이미지 생성 실패 - {}ms 후 재시도", waitTime);
-                try {
-                    Thread.sleep(waitTime);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    log.error("❌ 재시도 중 인터럽트 발생");
-                    return images;
-                }
-                waitTime *= 2; // 대기 시간 2배 증가
-                retryCount++;
-            }
-
-            if (base64Image == null) {
-                log.error("❌ 이미지 생성 실패: 문단 {}", paragraph);
-                continue;
-            }
-
-            String imageUrl = saveImage(base64Image, imageId);
-            imageRepository.save(new Image(imageId, imageUrl));
-            images.add(new ImageDto(imageId, imageUrl));
-            paragraphImageMap.put(i, imageId);
-
-
-            if ((i + 1) % batchSize == 0) {
-                log.info("🕒 배치 요청 후 3초 대기...");
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
+        List<CompletableFuture<ImageDto>> futureList = new ArrayList<>();
+        for (String paragraph: paragraphs) {
+            futureList.add(generateImageAsync(paragraph,style));
         }
 
-        summary = new Summary(summary.getSummaryId(), summary.getSummaryText(), summary.getParagraphs(), paragraphImageMap, summary.getPlatform(),
-                summary.getVoice(), summary.getStyle());
+        List<ImageDto> images = futureList.stream()
+                .map(CompletableFuture::join)
+                .toList();
+
+        for (int i=0; i<images.size(); i++) {
+            paragraphImageMap.put(i, images.get(i).getImageId());
+        }
+
+        summary = new Summary(summary.getSummaryId(), summary.getSummaryText(), summary.getParagraphs(),
+                paragraphImageMap, summary.getPlatform(), summary.getVoice(), summary.getStyle());
         summarizeService.updateSummary(summary);
 
-        log.info("✅ 이미지 생성 완료 (총 {}개)",images.size());
+        log.info("✅ 비동기 이미지 생성 완료 (총 {}개)", images.size());
         return images;
     }
 
     public ImageDto regenerateImage(String imageId) {
-        Image existingImage = imageRepository.findById(imageId)
+        imageRepository.findById(imageId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이미지 ID입니다: " + imageId));
 
         Summary summary = summarizeService.getSummaryByImageId(imageId);
@@ -149,7 +132,9 @@ public class ImageGenerationService {
     private Map<String, Object> createImageRequestData(String prompt, String style) {
         return Map.of(
                 "prompt", prompt,
-                "style", style
+                "style", style,
+                "width", 576,
+                "height", 1024
         );
     }
 
@@ -200,11 +185,6 @@ public class ImageGenerationService {
     private String saveImage(String base64Image, String imageId) {
         try {
             byte[] decodedBytes = Base64.getDecoder().decode(base64Image);
-            File uploadDir = new File(UPLOAD_DIR);
-
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
 
             String filePath = UPLOAD_DIR + imageId + ".png";
             try (FileOutputStream fos = new FileOutputStream(filePath)) {
