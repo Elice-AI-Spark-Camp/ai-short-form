@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import elice.aishortform.image.entity.ImageEntity;
+import elice.aishortform.image.entity.Image;
 import elice.aishortform.image.repository.ImageRepository;
 import elice.aishortform.summary.entity.Summary;
 import elice.aishortform.summary.repository.SummaryRepository;
@@ -59,7 +59,7 @@ public class VideoService {
 					for (Map.Entry<Integer, String> entry : paragraphImageMap.entrySet()) {
 						// 이미지 ID를 가져와서 실제 URL로 변환
 						String imageId = entry.getValue();
-						Optional<ImageEntity> imageEntity = imageRepository.findById(imageId);
+						Optional<Image> imageEntity = imageRepository.findById(imageId);
 						imageEntity.ifPresent(
 							entity -> imageUrls.put(String.valueOf(entry.getKey()), entity.getImageUrl()));
 					}
