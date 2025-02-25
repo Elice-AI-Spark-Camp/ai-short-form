@@ -105,15 +105,16 @@ public class ImageGenerationService {
 
         String paragraphText = summary.getParagraphs().get(paragraphIndex);
 
+        String newImageId = generateUniqueImageId();
         String base64Image = fetchImages(paragraphText, summary.getStyle());
-        String newImageUrl = saveImage(base64Image, imageId);
+        String newImageUrl = saveImage(base64Image, newImageId);
 
-        Image newImage = new Image(imageId, newImageUrl);
+        Image newImage = new Image(newImageId, newImageUrl);
         imageRepository.save(newImage);
-        summary.getParagraphImageMap().put(paragraphIndex, imageId);
+        summary.getParagraphImageMap().put(paragraphIndex, newImageId);
         summarizeService.updateSummary(summary);
 
-        return new ImageDto(imageId, newImageUrl);
+        return new ImageDto(newImageId, newImageUrl);
     }
 
     private String fetchImages(String prompt, String style) {
