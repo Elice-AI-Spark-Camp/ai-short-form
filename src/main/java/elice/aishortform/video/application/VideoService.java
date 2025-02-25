@@ -10,6 +10,7 @@ import java.util.HashMap;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.transaction.annotation.Transactional;
 
 import elice.aishortform.image.entity.Image;
 import elice.aishortform.image.repository.ImageRepository;
@@ -26,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class VideoService {
 
 	private final VideoRepository videoRepository;
@@ -33,12 +35,13 @@ public class VideoService {
 	private final SummaryRepository summaryRepository;
 	private final ImageRepository imageRepository;
 
-	@Async // 비동기 처리 기능을 활성화하는 어노테이션
+	@Async
+	@Transactional(readOnly = true)
 	public CompletableFuture<Video> generateVideo(Long summaryId) {
 		return CompletableFuture.supplyAsync(() -> {
 			try {
 				// 1. Summary 정보 조회
-				Summary summary = summaryRepository.findById(summaryId)
+				Summary summary = summaryRepository.findByIdWithParagraphImageMap(summaryId)
 					.orElseThrow(() -> new IllegalArgumentException("Summary not found: " + summaryId));
 
 				// 2. 비디오 객체 생성 및 초기 저장 (PENDING 상태)
