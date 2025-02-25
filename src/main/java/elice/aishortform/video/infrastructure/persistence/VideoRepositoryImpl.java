@@ -1,5 +1,6 @@
 package elice.aishortform.video.infrastructure.persistence;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -16,14 +17,40 @@ public class VideoRepositoryImpl implements VideoRepository {
 
 	@Override
 	public Video save(Video video) {
-		VideoJpaEntity entity = new VideoJpaEntity(video.getSummaryId(), video.getStatus(), video.getVideoUrl());
+		VideoJpaEntity entity = toEntity(video);
 		VideoJpaEntity savedEntity = videoJpaRepository.save(entity);
-		return new Video(savedEntity.getId(), savedEntity.getSummaryId(), savedEntity.getVideoUrl(), savedEntity.getStatus(), savedEntity.getCreatedAt());
+		return toDomain(savedEntity);
 	}
 
 	@Override
 	public Optional<Video> findById(Long videoId) {
 		return videoJpaRepository.findById(videoId)
-			.map(entity -> new Video(entity.getId(), entity.getSummaryId(), entity.getVideoUrl(), entity.getStatus(), entity.getCreatedAt()));
+			.map(this::toDomain);
+	}
+
+	@Override
+	public List<Video> findBySummaryId(Long summaryId) {
+		return videoJpaRepository.findBySummaryId(summaryId)
+			.stream()
+			.map(this::toDomain)
+			.toList();
+	}
+
+	private VideoJpaEntity toEntity(Video video) {
+		return new VideoJpaEntity(
+			video.getSummaryId(),
+			video.getStatus(),
+			video.getVideoUrl()
+		);
+	}
+
+	private Video toDomain(VideoJpaEntity entity) {
+		return new Video(
+			entity.getId(),
+			entity.getSummaryId(),
+			entity.getVideoUrl(),
+			entity.getStatus(),
+			entity.getCreatedAt()
+		);
 	}
 }
