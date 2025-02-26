@@ -3,6 +3,7 @@ package elice.aishortform.image.controller;
 import elice.aishortform.image.dto.ImageGenerationRequestDto;
 import elice.aishortform.image.dto.ImageGenerationResponseDto;
 import elice.aishortform.image.dto.ImageGenerationResponseDto.ImageDto;
+import elice.aishortform.image.dto.TestImageGenerationRequestDto;
 import elice.aishortform.image.service.ImageGenerationService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
@@ -30,5 +31,10 @@ public class ImageGenerationController implements ImageApiDocs {
     public ResponseEntity<ImageDto> regenerateImage(@PathVariable("image_id") String imageId) {
         ImageDto newImage = imageGenerationService.regenerateImage(imageId);
         return ResponseEntity.ok(newImage);
+    }
+
+    public ResponseEntity<ImageGenerationResponseDto.ImageDto> generateTestImages(@RequestBody TestImageGenerationRequestDto request) {
+        ImageDto image = imageGenerationService.generateTestImages(request.prompt(), request.style());
+        return ResponseEntity.ok(image);
     }
 }
