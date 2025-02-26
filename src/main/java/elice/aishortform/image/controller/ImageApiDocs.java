@@ -3,6 +3,7 @@ package elice.aishortform.image.controller;
 import elice.aishortform.image.dto.ImageGenerationRequestDto;
 import elice.aishortform.image.dto.ImageGenerationResponseDto;
 import elice.aishortform.image.dto.ImageGenerationResponseDto.ImageDto;
+import elice.aishortform.image.dto.TestImageGenerationRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,10 +25,19 @@ public interface ImageApiDocs {
 
     @Operation(
             summary = "기존 이미지 재생성",
-            description = "주어진 image_id에 대해 새로운 AI 이미지를 생성합니다. \n" +
-                    "- 요청: image_id \n" +
-                    "- 응답: image_id, image_url \n"
+            description = """
+                    주어진 image_id에 대해 새로운 AI 이미지를 생성합니다.\s
+                    - 요청: image_id\s
+                    - 응답: image_id, image_url\s
+                    """
     )
     @PutMapping("/{image_id}/regenerate")
     ResponseEntity<ImageDto> regenerateImage(@PathVariable("image_id") String imageId);
+
+    @Operation(
+            summary = "테스트용 단일 이미지 생성",
+            description = "임의의 프롬프트와 스타일을 입력하여 단일 이미지를 생성하는 테스트 API입니다."
+    )
+    @PostMapping("/generate-test-single")
+    ResponseEntity<ImageGenerationResponseDto.ImageDto> generateTestImages(@RequestBody TestImageGenerationRequestDto request);
 }

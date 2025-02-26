@@ -117,6 +117,16 @@ public class ImageGenerationService {
         return new ImageDto(newImageId, newImageUrl);
     }
 
+    public ImageDto generateTestImages(String prompt, String style) {
+       String imageId = generateUniqueImageId();
+       String base64Image = fetchImages(prompt, style);
+
+        String imageUrl = saveImage(base64Image, imageId);
+        imageRepository.save(new Image(imageId,imageUrl));
+
+        return new ImageDto(imageId, imageUrl);
+    }
+
     private String fetchImages(String prompt, String style) {
         log.info("📌 이미지 생성 요청 ({}-style={})",prompt,style);
 
