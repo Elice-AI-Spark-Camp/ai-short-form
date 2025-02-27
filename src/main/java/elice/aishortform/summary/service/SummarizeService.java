@@ -44,7 +44,7 @@ public class SummarizeService {
         // python 크롤링 요청
         String crawledContent = crawlingService.fetchCrawledContent(request.url());
 
-        String summaryText = fetchSummary(crawledContent);
+        String summaryText = fetchSummary(crawledContent).replace("\n"," ");
         List<String> paragraphs = Arrays.asList(summaryText.split("<br>"));
 
         Summary summary = new Summary(
