@@ -23,8 +23,8 @@ public class SummarizeController implements SummarizeApiDocs{
 
     private final SummarizeService summarizeService;
 
-    public SummarizeResponse summarize(@RequestBody SummarizeRequest request) {
-        return summarizeService.summarize(request);
+    public ResponseEntity<SummarizeResponse> summarize(@RequestBody SummarizeRequest request) {
+        return ResponseEntity.ok(summarizeService.summarize(request));
     }
 
     public ResponseEntity<Summary> updateSummary(@RequestBody SummarizeUpdateRequest request) {
