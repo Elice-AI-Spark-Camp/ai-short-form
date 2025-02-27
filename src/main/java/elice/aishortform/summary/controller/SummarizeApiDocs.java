@@ -20,7 +20,7 @@ public interface SummarizeApiDocs {
             summary = "요약 생성",
             description = "주어진 URL과 플랫폼 정보를 기반으로 콘텐츠를 크롤링하고 요약을 생성합니다.")
     @PostMapping
-    SummarizeResponse summarize(@RequestBody SummarizeRequest request);
+    ResponseEntity<SummarizeResponse> summarize(@RequestBody SummarizeRequest request);
 
     @Operation(
             summary = "요약 업데이트",
