@@ -49,7 +49,7 @@ public class SummarizeService {
             throw new IllegalArgumentException("크롤링 실패로 인해 요약을 진행할 수 없습니다. 오류 내용: " + crawledContent);
         }
 
-        String summaryText = fetchSummary(crawledContent).replace("\n"," ");
+        String summaryText = fetchSummary(crawledContent, request.platform()).replace("\n"," ");
         List<String> paragraphs = Arrays.asList(summaryText.split("<br>"));
 
         Summary summary = new Summary(
@@ -71,11 +71,11 @@ public class SummarizeService {
                 .build();
     }
 
-    private String fetchSummary(String userContent) {
+    private String fetchSummary(String userContent, String platform) {
         log.info("📌 요약 요청 시작");
 
         try {
-            Map<String, Object> requestData = createSummaryRequestData(userContent);
+            Map<String, Object> requestData = createSummaryRequestData(userContent, platform);
 
             String responseBody = sendRequest(requestData);
 
@@ -87,15 +87,26 @@ public class SummarizeService {
     }
 
     // 요약 API 요청 데이터 생성
-    private Map<String, Object> createSummaryRequestData(String userContent) {
+    private Map<String, Object> createSummaryRequestData(String userContent, String platform) {
+        int maxLength = getPlatformMaxLength(platform);
+        String systemMessage = summaryConfig.getSystemMessage() + " 요약을 " + maxLength + "자 이내로 생성해.";
+
         return Map.of(
                 "model", "helpy-pro",
                 "sess_id", UUID.randomUUID().toString(),
                 "messages", List.of(
-                        Map.of("role", "system", "content", summaryConfig.getSystemMessage()),
+                        Map.of("role", "system", "content", systemMessage),
                         Map.of("role", "user", "content", userContent)
                 )
         );
+    }
+
+    private int getPlatformMaxLength(String platform) {
+        return switch (platform.toLowerCase()) {
+            case "youtube" -> 2300;
+            case "tiktok" -> 7800;
+            default -> 1100;
+        };
     }
 
     // OkHttp를 사용하여 API 요청 전송
