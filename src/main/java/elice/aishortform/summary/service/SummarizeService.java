@@ -44,6 +44,10 @@ public class SummarizeService {
 
         // python 크롤링 요청
         String crawledContent = crawlingService.fetchCrawledContent(request.url());
+        if (crawledContent.startsWith("❌ 오류 발생:")) {
+            log.error("❌ 크롤링 실패: {}",crawledContent);
+            throw new IllegalArgumentException("크롤링 실패로 인해 요약을 진행할 수 없습니다. 오류 내용: " + crawledContent);
+        }
 
         String summaryText = fetchSummary(crawledContent).replace("\n"," ");
         List<String> paragraphs = Arrays.asList(summaryText.split("<br>"));
