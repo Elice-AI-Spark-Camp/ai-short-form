@@ -10,8 +10,8 @@
 - 두 단어의 조합으로 **"빠르고 즉각적인 요약 콘텐츠"** 제공
 
 ## 👥 팀 구성 - Team SumSquad
-- 김재협 (Back-end)
-- 소유진 (Back-end)
+- 김재협 (Back-end: 영상 생성, TTS 구현)
+- 소유진 (Back-end: 웹 크롤링, 콘텐츠 요약)
 - 송연지 (Front-end)
 - 이윤희 (기획)
 
