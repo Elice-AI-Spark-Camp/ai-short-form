@@ -38,6 +38,7 @@ public class SummarizeService {
     private final TtsVoiceConfig ttsVoiceConfig;
     private final SummaryConfig summaryConfig;
 
+    @Transactional
     public SummarizeResponse summarize(SummarizeRequest request){
         log.info("📌 크롤링 요청 URL: {}, 플랫폼: {}",request.url(),request.platform());
 
@@ -162,10 +163,10 @@ public class SummarizeService {
         summaryRepository.save(summary);
     }
 
+    @Transactional(readOnly = true)
     public Summary getSummaryByImageId(String imageId) {
-        return summaryRepository.findAll().stream()
-                .filter(summary -> summary.getParagraphImageMap().containsValue(imageId))
-                .findFirst()
+        return summaryRepository.findByImageId(imageId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 image_id에 대한 Summary를 찾을 수 없습니다: " + imageId));
     }
+
 }
