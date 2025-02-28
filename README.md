@@ -34,6 +34,13 @@
 ## 🛠 기술 스택
 <img width="668" alt="image" src="https://github.com/user-attachments/assets/6e5c9d67-9d66-480e-9856-1cf1cbbaa952" />
 
+<br/><br/>
+
+## 🏛️ PROJECT ARCHITECTURE
+<img width="519" alt="image" src="https://github.com/user-attachments/assets/cd76e385-8896-4856-9d7e-de1e63ade464" />
+
+
+
 
 <br/><br/>
 
