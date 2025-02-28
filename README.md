@@ -37,7 +37,8 @@
 <br/><br/>
 
 ## 🏛️ PROJECT ARCHITECTURE
-<img width="519" alt="image" src="https://github.com/user-attachments/assets/cd76e385-8896-4856-9d7e-de1e63ade464" />
+<img width="984" alt="image" src="https://github.com/user-attachments/assets/a4544921-a456-4ccf-a8d1-4d696d317f02" />
+
 
 
 
