@@ -1,19 +1,9 @@
-
-
-
-
 # 🎬 SNAPSUM - AI 기반 쇼트폼 영상 제작 서비스
 
 **SNAPSUM**은 웹 콘텐츠를 빠르게 요약하고 쇼트폼 영상으로 자동 변환해주는 AI 서비스입니다.
 - **SNAP** → "빠르다, 즉각적인"이라는 의미
 - **SUM** → "Summary(요약)"를 의미
 - 두 단어의 조합으로 **"빠르고 즉각적인 요약 콘텐츠"** 제공
-
-## 👥 팀 구성 - Team SumSquad
-- 김재협 (Back-end: 영상 생성, TTS 구현)
-- 소유진 (Back-end: 웹 크롤링, 콘텐츠 요약)
-- 송연지 (Front-end)
-- 이윤희 (기획)
 
 ## 🎯 서비스 목표
 - 웹페이지 링크만으로 **AI가 자동으로 콘텐츠를 요약**
@@ -42,14 +32,12 @@
 - **비동기 처리**: Spring WebFlux를 활용한 효율적인 API 처리
 
 ## 🛠 기술 스택
+<img width="668" alt="image" src="https://github.com/user-attachments/assets/6e5c9d67-9d66-480e-9856-1cf1cbbaa952" />
 
-### 백엔드
-- **Spring Boot 3.4.2**
-- **Spring Data JPA + MySQL**
-- **Spring WebFlux** (비동기 API 처리)
-- **Redis** (AI 응답 캐싱)
 
-### AI 서비스
+<br/><br/>
+
+### Elice ML AI 서비스
 - **텍스트 요약**: Elice Helpy Pro
 - **음성 생성**: Elice Text to Speech API
 - **이미지 생성**: Elice Helpy Pro
@@ -66,12 +54,25 @@
 - ✅ 비동기 API 처리 최적화
 - ✅ Jenkins를 활용한 자동화된 배포 파이프라인
 
-## 🔜 향후 계획
-- 사용자 계정 관리 및 인증 (Spring Security + JWT)
-- 영상 템플릿 다양화
-- AWS S3 연동을 통한 영상 저장소 확장
-- 성능 최적화 및 서비스 안정화
+## DEVELOPERS
 
----
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/YachaTree"><img src="https://avatars.githubusercontent.com/YachaTree" width="150px;" alt="">
+    <td align="center"><a href="https://github.com/yujin-zero"><img src="https://avatars.githubusercontent.com/yujin-zero" width="150px;" alt="">
+  </tr>
+  <tr>
+    <td align="center"><strong>🌟김재협(팀장)</strong></td>
+    <td align="center"><strong>소유진</strong></td>
+  </tr>
+    <tr>
+    <td align="center"><a href="https://github.com/YachaTree"><b>@YachaTree</b></td>
+    <td align="center"><a href="https://github.com/yujin-zero"><b>@yujin-zero</b></td>
+  </tr>
+   <tr>
+    <td align="center">tts, 동영상</td>
+    <td align="center">웹 크롤링, 텍스트 요약, 이미지 생성</td>
+  </tr>
+</table>
 
 © 2025 Team SumSquad. All rights reserved.
