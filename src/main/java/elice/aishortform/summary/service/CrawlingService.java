@@ -22,10 +22,12 @@ public class CrawlingService {
     }
 
     public String fetchCrawledContent(String blogUrl) {
+        String fixedUrl = convertNaverBlogUrl(blogUrl);
+
         String apiUrl = fastApiUrl + "/crawl";
 
         Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("url",blogUrl);
+        requestBody.put("url",fixedUrl);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -39,5 +41,12 @@ public class CrawlingService {
         } else {
             return "❌ 크롤링 실패";
         }
+    }
+
+    private String convertNaverBlogUrl(String blogUrl) {
+        if (blogUrl.contains("m.blog.naver.com")) {
+            return blogUrl.replace("m.blog.naver.com","blog.naver.com");
+        }
+        return blogUrl;
     }
 }
