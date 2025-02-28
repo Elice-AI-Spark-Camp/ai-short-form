@@ -70,7 +70,7 @@
     <td align="center"><a href="https://github.com/yujin-zero"><b>@yujin-zero</b></td>
   </tr>
    <tr>
-    <td align="center">tts, 동영상</td>
+    <td align="center">TTS, 동영상 생성</td>
     <td align="center">웹 크롤링, 텍스트 요약, 이미지 생성</td>
   </tr>
 </table>
