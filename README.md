@@ -62,6 +62,10 @@
 - ✅ 비동기 API 처리 최적화
 - ✅ Jenkins를 활용한 자동화된 배포 파이프라인
 
+## FastAPI Server
+[Python Server](https://github.com/Elice-AI-Spark-Camp/SnapSum-Python-Back)
+
+
 ## DEVELOPERS
 
 <table>
@@ -83,4 +87,4 @@
   </tr>
 </table>
 
-© 2025 Team SumSquad. All rights reserved.
+
