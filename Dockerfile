@@ -1,7 +1,11 @@
 FROM eclipse-temurin:21-jdk-jammy
 
 WORKDIR /app
-ARG JAR_FILE=build/libs/*.jar
-COPY ${JAR_FILE} app.jar
+
+COPY . .
+
+RUN chmod +x ./gradlew
+RUN ./gradlew bootJar --no-daemon
+RUN cp build/libs/AiShortForm-0.0.1-SNAPSHOT.jar ./app.jar
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
