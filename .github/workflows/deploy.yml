@@ -26,6 +26,6 @@ jobs:
             cd ~/SnapSum-Dockerized/spring-backend
             git pull origin dev
             cd ~/SnapSum-Dockerized
-            docker compose down
-            docker compose up -d --build
+            docker-compose down
+            docker-compose up -d --build
           EOF
